@@ -1,0 +1,621 @@
+---
+title: "Big Data to Knowledge Tutorial"
+author: ''
+date: "8/9/2020"
+output:
+  word_document:
+    toc: yes
+  html_document:
+    toc: yes
+    toc_float: yes
+    number_sections: yes
+    code_download: yes
+    theme: united
+    highlight: tango
+  pdf_document:
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = TRUE, warning = TRUE)
+```
+
+# Basics
+
+First, let's load in some packages that we will use later on. If you do not already have a package installed, you can install it by running ``install.packages('[insert package name]')`` in the console. If you already have a package installed, but you get an error when trying to use it, try running ``update.packages('[insert package name]')`` or installing it again to update it to the latest version.
+
+```{r}
+library(tidyverse)
+library(readr)
+library(rsample)
+library(broom)
+library(rpart)
+library(glmnet)
+library(yardstick)
+library(xgboost)
+library(ranger)
+library(nnet)
+```
+
+We start with some notes about R's "tidyverse". With all the functions provided by the tidyverse, you should almost never have to run a for- or while-loop. Instead, everything is vectorized. You can still use loops if it is easier for you, but just know that you do not have to. Next, we highlight the star of the tidyverse---the pipe operator, which is written as ``%>%``. This operator is extremely useful for the composition of functions. More specifically, we can now write something like ``h(g(f(x)))`` as ``x %>% f() %>% g() %>% h()``. Similarly, ``f(x, y)`` can be written as ``x %>% f(y)`` or ``x %>% f(., y)``. Although this may look a little cumbersome at first, it can be very useful when you would like to apply a moderate to lengthy sequence of functions to an object. Doing this also helps to avoid the practice of constantly making new object after object after applying a single function i.e. ``x2 <- f(x)`` followed by ``x3 <- g(x2)``. Here is a quick example of the pipe being used in practice:
+
+```{r}
+add <- function(x, y){x + y}
+multiply <- function(x, y){x * y}
+
+2 %>%
+  add(3) %>%
+  multiply(4) %>%
+  add(-5)
+```
+Of course it would be just as easy to have done the following in this case, but you can already start to imagine scenarios in which this can be very useful.
+
+```{r}
+(2 + 3) * 4 - 5
+```
+
+# Light Exercise
+
+## Loading and Splitting Data
+
+First, let's load in the data and check to see that it was read in correctly with the ``head()`` function. The location that you are reading in the data from should match where the csv file is located on your machine.
+
+```{r}
+dementia <- read_csv("C:/Users/andre/Documents/clinical-data-for-alzheimers-clean.csv")
+head(dementia)
+```
+
+The ``read_csv()`` from the ``readr`` package automatically guesses what the type, i.e. double, integer, character, etc., of each column is.
+
+The interpretation of gender and age are straightforward. After a little research, it appears as if mmse stands for Mini-Mental State Exam (a 30-point test used to measure thinking ability) and memory is a rating on a scale with categories 0, 0.5, 1, 2, and 3. The dx1 column is a binary indicator of whether or not the subject was diagnosed with dementia. This will be our primary outcome variable. Let's see how frequent each class of the outcome is in the data.
+
+```{r}
+count(dementia, dx1)
+```
+
+Now, before we do anything else, let's split the data into training and testing sets so that we can evaluate the models that we create with the training set on the testing set. By doing this, we will also be able to show the difference between model performance on the training and testing sets later on.
+
+```{r}
+set.seed(42)
+splits <- initial_split(dementia, prop = 0.7, strata = dx1)
+df_train <- training(splits)
+df_test <- testing(splits)
+```
+
+## Linear Regression
+
+We start with estimating a linear regression model. When interpreting the results, we can see that memory and age are significant predictors of the presence of dementia and that the R-squared value of the model is 0.23.
+
+
+```{r}
+fit_lm <- lm(dx1 ~ gender + age + mmse + memory, data = df_train)
+summary(fit_lm)
+```
+
+## Decision Tree
+
+That was pretty straightforward. It only takes a few lines of code to generate a decision tree as well. Note the shorthand method we can use to write a formula if we want to use all possible predictors.
+
+```{r}
+fit_tree <- rpart(as.factor(dx1) ~ ., data = df_train)
+fit_tree
+```
+
+The output here is a little messy, but we can visualize the tree that was made.
+
+```{r}
+plot(fit_tree, margin = 0.1)
+text(fit_tree)
+```
+
+Given that there are only 214 observations in the training set, this individual decision tree looks like it could be overfit. A way to decrease the complexity level of the tree is by changing some of the default parameters. For example, we could have demanded that a minimum of 50 observations must exist in a tree node in order for a split to be attempted (instead of the default 20). This provides just a glimpse of the more formulaic way into which you can tune the hyperparameters of your model.
+
+```{r}
+fit_tree2 <- rpart(as.factor(dx1) ~ ., data = df_train, minsplit = 50)
+plot(fit_tree2, margin = 0.1)
+text(fit_tree2)
+```
+
+## Comparing Model Performance and Examining Overfitting
+
+Now that we have built two fundamentally different models, how can we compare their performance? Let's start by assessing how accurate their predictions are on the training set.
+
+One way to do this with the linear model is to use the ``augment`` function from the ``broom`` package. We can collect the fitted values (predictions) that this model made on the training set.
+
+```{r}
+augment(fit_lm)
+```
+
+Let's make a confusion matrix so that we can see how well our fitted values match the true diagnoses. This is where using the tidyverse can come in handy. We take the table that we just previewed, select the dx1_num and .fitted columns, round the .fitted column to make it binary, then make a cross-table with these two columns.
+
+```{r}
+augment(fit_lm) %>% 
+  select(dx1, .fitted) %>% 
+  mutate(.fitted = round(.fitted)) %>% 
+  table()
+```
+Now, it's easy enough to compute the accuracy of our predictions. (There are also built-in functions that can do this for you.)
+
+```{r}
+(67+80)/214
+```
+
+To do the same with the decision tree, we need to use the predict function. This will give us probabilities. These probabilities represent the proportion of each diagnosis class that ended up being in the leaf of the trained tree.
+
+```{r}
+predict(fit_tree, df_train) %>% head()
+```
+
+Let's make another confusion matrix before computing the accuracy of the tree model. We have to run through a few more functions than we did with the other model because the output is in a different format. The following code may look a little complicated, but you can always run through individual parts of it to gain a better understanding of what is happening. Because we will run a similar code chunk for almost all of the models we implement after this, let's go over what is happening.
+
+First, we use the predict function with the fitted tree to make predictions with the data. Next, we use the ``round()`` function to round the estimated probabilities. Then, we use the ``as_tibble()`` function to convert the output from a matrix to a tibble. A tibble is the tidyverse's method of storing data in a table-like format and makes it easier for us to work with. Then, we use the ``select()`` function to only select the automatically named '1' column. (For each model we implement later, it is possible that this column gets named something different automatically.) While doing this, we perform a shortcut to renaming this ugly-named column to 'pred' for prediction. Next, we bind these predictions to the original data set using ``bind_cols()``. Then, we select the newly named pred column and the original dx1 column using ``select()`` again and finally make a cross-table with ``table()``.
+
+```{r}
+predict(fit_tree, df_train) %>% 
+  round() %>%
+  as_tibble() %>% 
+  select(pred = `1`) %>% 
+  bind_cols(df_train) %>% 
+  select(dx1, pred) %>%
+  table()
+```
+
+Thus, the tree model gave a better fit on the training data than the linear model.
+
+```{r}
+(86+74)/214
+```
+
+Now, let's see how well each model performs on the testing set, which is what we really care about. We just need to adjust some of the code that we have previously used to make this happen.
+
+```{r}
+predict(fit_lm, df_test) %>% 
+  round() %>%
+  as_tibble() %>% 
+  select(pred = value) %>% 
+  bind_cols(df_test) %>% 
+  select(dx1, pred) %>%
+  table()
+
+predict(fit_tree, df_test) %>% 
+  round() %>%
+  as_tibble() %>% 
+  select(pred = `1`) %>% 
+  bind_cols(df_test) %>% 
+  select(dx1, pred) %>%
+  table()
+```
+
+```{r}
+(26+30)/91
+(31+28)/91
+```
+
+We observe that the tree model still performs better than the linear model on the testing set, but also that each model performs much worse on the testing set than on the training set. This is expected, but the degree to which this is true may indicate that there is some overfitting, especially for the tree model. Also, take note of how the confusion matrices differ for the models. It appears as if the linear model predicts the 1 class better than tree model, but the opposite is true for the 0 class. This can be important to consider when misclassification errors on one class are much more important than errors on the other class.
+
+# Ramping Up
+
+## Logistic Regression and ROC Curve
+
+It is possible that the linear regression model performed poorly because it is not really meant to perform classification. It is almost always better to perform logistic regression for this task. Let's do that now. Note that there is no R-squared for this model, but you can compute alternatives to this if desired. We will not do that here.
+
+```{r}
+fit_glm <- glm(as.factor(dx1) ~ ., data = df_train, family = binomial(link = "logit"))
+summary(fit_glm)
+```
+
+Just like our linear regression model, age and memory are shown as significant. The interpretation of the coefficient estimates are different though. Let's see how the logistic model performs on the testing set.
+
+```{r}
+predict(fit_glm, df_test, type = "response") %>% 
+  round() %>%
+  as_tibble() %>% 
+  select(pred = value) %>% 
+  bind_cols(df_test) %>% 
+  select(dx1, pred) %>%
+  table()
+```
+
+So we are able to compare the logistic regression model performance to that of linear regression.
+
+```{r}
+(26+30)/91
+```
+
+This is just one way to evaluate the performance of our model. One other thing we are now able to do with the logistic regression model is make a receiver operating curve (ROC curve). Although we were able to round the predictions of the linear model to be binary, the raw predictions can not be interpreted as probabilities like the raw predictions of the logistic regression model can. (If we had looked closely, we would be able to see that some of the linear model predictions fell outside the 0-1 range.) The ROC curve shows us the trade-off between sensitivity and specificity at various probability thresholds. If we really wanted to make sure that all of the true positives were captured (higher sensitivity), then we may consider a very low probability threshold for classification. (One important note about the following code is that we made sure to encode the levels of the dx1 factor variable so that the positive class, i.e. 1, is the first level.)
+
+```{r}
+roc_glm <-
+  predict(fit_glm, df_test, type = "response") %>% 
+  as_tibble() %>%
+  select(pred = value) %>% 
+  bind_cols(df_test) %>%
+  mutate(dx1 = factor(dx1, levels = c(1, 0)))
+
+roc_curve(roc_glm, truth = dx1, pred)
+roc_curve(roc_glm, truth = dx1, pred) %>% autoplot()
+roc_auc(roc_glm, truth = dx1, pred)
+```
+
+Now, if we use the threshold of 0.5 and round our predictions to make a confusion matrix, just as we have done before, but instead use the ``conf_mat()`` function from the ``yardstick`` package, we can automatically compute various performance metrics. We are making a table like we have before, but by using the ``conf_mat()`` function to do this, we can now automatically pull various metrics about the table with the ``summary()`` function. Notice how the accuracy is the same was what we calculated before, but we also automatically get information about all of the other metrics.
+
+```{r}
+cm_glm <-
+  predict(fit_glm, df_test, type = "response") %>%
+  round() %>%
+  as_tibble() %>% 
+  select(pred = value) %>%
+  bind_cols(df_test) %>% 
+  mutate(dx1 = factor(dx1, levels = c(1, 0)),
+         pred = factor(pred, levels = c(1, 0))) %>% 
+  conf_mat(dx1, pred) 
+
+cm_glm
+summary(cm_glm)
+```
+
+## LASSO
+
+We have previously observed that the age and memory variables seem to be what our models are indicating to be the important variables for prediction. So let's explore the notion of variable selection with LASSO. We will use the ``cv.glmnet()`` function to help us do this. Unlike previous model functions, this function does not take a formula as an input. Instead, we must encode our predictors as a matrix and ensure all variables are encoded as numerics. Similarly, our response variable must be in vector format.
+
+Once we fit the LASSO model, we plot lambda (the penalty parameter of LASSO) against cross-validated misclassification error. (Luckily, the ``cv.glmnet()`` function performs cross-validation without us having to put much effort in.) The plot shows us the penalty at which the error is minimized and the greatest penalty at which misclassification is within one standard error of the estimated minimum error. Using the recommendation as dictated by this one-standard-error rule is a heuristic that is commonly used. For us, it is saying to only use age and memory for model building.
+
+```{r}
+X_train <- df_train %>% 
+  mutate(gender = as.numeric(ifelse(gender == "male", 1, 0))) %>%
+  select(-dx1) %>%
+  as.matrix()
+
+Y_train <- df_train$dx1
+
+fit_lasso <- cv.glmnet(x = X_train, y = Y_train, alpha = 1, family = "binomial", type.measure = "class")
+plot(fit_lasso)
+coef(fit_lasso, s = fit_lasso$lambda.min)
+coef(fit_lasso, s = fit_lasso$lambda.1se)
+```
+
+# More Advanced
+
+## Boosting
+
+As we have previously seen, a singular decision tree can be severely overfit to the data. One way to try to avoid this is by boosting. Boosting essentially means combining several "weak" learners, which decision trees are usually considered to be, into a strong learner. The idea behind this is to iteratively build decision trees, where each new tree learns from the errors of previous trees, and then the collection of trees are used to make predictions on new data.
+
+There are different ways in which this idea can be implemented, including Adaboost (adaptive boosting), but we will only try out gradient boosting here. The ``xgboost`` package requires that we have data in matrices. I have arbitrarily set the algorithm to stop after it has made 25 trees.
+
+```{r}
+fit_xgb <- xgboost(data = X_train, label = Y_train, 
+                   nrounds = 25, booster = "gbtree", objective = "binary:logistic",
+                   eval_metric = "error")
+```
+
+The model automatically outputs performance on the training set, and we can see that the longer that we let it go on, the more it reduces training error. Next, we need to convert our testing set into a numeric matrix in order to make predictions with it.
+
+```{r}
+X_test <- df_test %>% 
+  mutate(gender = as.numeric(ifelse(gender == "male", 1, 0))) %>%
+  select(-dx1) %>%
+  as.matrix()
+
+cm_xgb <- 
+  predict(fit_xgb, X_test) %>%
+  round() %>%
+  as_tibble() %>% 
+  select(pred = value) %>%
+  bind_cols(df_test) %>% 
+  mutate(dx1 = factor(dx1, levels = c(1, 0)),
+         pred = factor(pred, levels = c(1, 0))) %>% 
+  conf_mat(dx1, pred) 
+
+cm_xgb
+summary(cm_xgb)
+```
+
+Here, we do not see any improvement in performance over the singular decision tree on the testing set. It is possible that only having four predictors prevents us from seeing the usefulness of this boosting algorithm. It is also possible that we could improve this performance by tuning some of the boosting tree algoirthm's hyperparameters.
+
+## Random Forest
+
+Another possible way to avoid overfitting with a single decision tree is to "bag" (bootstrap + aggregation) decision trees. More specifically, we can replicate our data hundreds of times via random sampling and fit a decision tree to each replica of the data. Then, we aggregate the predictions of each tree to make one prediction. This is the idea behind a random forest. In addition, we can reduce the correlation between our trees by only examining a random subset of predictors at each node for every tree. (This is controlled via the mtry variable.)
+
+```{r}
+andrew <- ranger(as.factor(dx1) ~ ., data = df_train, importance = "permutation")
+andrew
+```
+
+The ``ranger()`` function actually stores the predictions and a confusion matrix that it makes with the training data automatically.
+
+```{r}
+head(fit_rf$predictions)
+fit_rf$confusion.matrix
+```
+
+However, we are more interested with how this fitted random forest performs on the testing set. The output of the random forest model is a little tricky to work with, so we add the ``pluck()`` function to our usual pipeline to make a confusion matrix.
+
+```{r}
+cm_rf <-
+  predict(fit_rf, df_test) %>%
+  pluck("predictions") %>%
+  as_tibble() %>% 
+  select(pred = value) %>% 
+  bind_cols(df_test) %>% 
+  mutate(dx1 = factor(dx1, levels = c(1,0)),
+         pred = factor(pred, levels = c(1,0))) %>%
+  conf_mat(dx1, pred)
+
+cm_rf
+summary(cm_rf)
+```
+
+It appears as if we did not improve on the singular decision tree model. The likely reason for this is that we do not have very many predictors with which to work. Suppose we had 100 predictors, of which 10 were very important. A singular decision tree may only use 3 of these important predictors to make its predictions. In a vacuum, this may not be too bad. Meanwhile, a random forest would be able to make hundreds of variations of trees that would utilize different combinations of these 10 predictors, and thus, could average out any imperfections that a singular tree may have.
+
+One interesting note is that the last two models capture variable importance. This is another way in which we can determine what the important predictors are.
+
+```{r}
+xgb.importance(model = fit_xgb)
+importance(fit_rf)
+```
+
+## Artificial Neural Network
+
+The last model that we will cover is an artificial neural network. This model is a little more abstract, but it is another way that we can try to learn the underlying relationships between the predictors and the outcome variable.
+
+```{r}
+fit_ann <- nnet(as.factor(dx1) ~ ., data = df_train, size = 2, rang = 0.1, decay = 0.0001, maxit = 100)
+fit_ann
+```
+```{r}
+cm_ann <-
+  predict(fit_ann, df_test) %>%
+  round() %>%
+  as_tibble() %>% 
+  select(pred = V1) %>% 
+  bind_cols(df_test) %>% 
+  mutate(dx1 = factor(dx1, levels = c(1,0)),
+         pred = factor(pred, levels = c(1,0))) %>%
+  conf_mat(dx1, pred)
+
+cm_ann
+summary(cm_ann)
+```
+Let's end this section by comparing an ROC curve generated by our neural network model against the one that we previously generated with our logistic regression model.
+
+```{r}
+roc_glm_named <- 
+  roc_curve(roc_glm, truth = dx1, pred) %>%
+  mutate(model = "glm")
+
+roc_ann <-
+  predict(fit_ann, df_test) %>% 
+  as_tibble() %>% 
+  select(pred = V1) %>% 
+  bind_cols(df_test) %>%
+  mutate(dx1 = factor(dx1, levels = c(1, 0)))
+
+roc_ann_glm_named <-
+  roc_curve(roc_ann, truth = dx1, pred) %>% 
+  mutate(model = "ann") %>% 
+  bind_rows(roc_glm_named)
+
+roc_ann_glm_named %>%
+  ggplot(aes(x = 1 - sensitivity, y = specificity, color = model)) + 
+  geom_path(lwd = 1.5, alpha = 0.8) + 
+  geom_abline(lty = 3) + 
+  coord_equal() +
+  theme_minimal()
+```
+
+When comparing two models like this, we are generally looking to see if one curve is position more "outside" of the other curve. In this case, we see little difference.
+
+# Supplemental: Cleaning and Visualizing Data
+
+The data that we started with was actually just a cleaned version of a more complex data set. Let's examine how we cleaned the data. First, we read in the raw data.
+
+```{r}
+dementia_raw <- read_csv("C:/Users/andre/Documents/clinical-data-for-alzheimers.csv")
+head(dementia_raw)
+```
+
+It has some of the same columns as before, but also Subject (some kind of patient identifier) and cdr columns. After a little research, it appears as if cdr stands for Clinical Dementia Rating and operates on the unique 0-0.5-1-2-3 scale that memory does as well. Let's do some further exploration of the data.
+
+```{r}
+library(skimr)
+library(visdat)
+skim(dementia_raw)
+vis_miss(dementia_raw)
+```
+
+This exploration shows that there is no missing data. But are we sure that is true?
+
+```{r}
+count(dementia_raw, Subject) %>% mutate(freq = n/sum(n))
+count(dementia_raw, Gender) %>% mutate(freq = n/sum(n))
+count(dementia_raw, mmse) %>% mutate(freq = n/sum(n))
+count(dementia_raw, ageAtEntry) %>% mutate(freq = n/sum(n))
+count(dementia_raw, cdr) %>% mutate(freq = n/sum(n))
+count(dementia_raw, memory) %>% mutate(freq = n/sum(n))
+count(dementia_raw, dx1) %>% mutate(freq = n/sum(n))
+```
+
+We notice that there is not necessarily one row per subject. For this exercise, we will only keep one row per subject. We also notice that missing data was manually encoded as ?'s in the raw data set, so we will need to do something about that. Now we take a closer look at some of the variables.
+
+```{r}
+count(dementia_raw, cdr, dx1) %>% group_by(cdr) %>% mutate(freq = n/sum(n))
+```
+
+We notice that cdr has a one-to-one mapping with our outcome variable except for one category. For this exercise, we will only investigate subjects with a cdr level of 0.5 because these are the only observations for which we can make interesting predictions.
+
+The following is an example of how we could impute the missing memory and mmse data with median and mean imputation, respectively. We can ignore the warning message because we know we are converting a variable (mmse) with ?'s into a numeric, so it is converting the ?'s into NA's by default.
+
+```{r}
+dementia_imputed <- 
+  dementia_raw %>%
+  mutate(memory = case_when(memory == "?" ~ median(memory),
+                            TRUE ~ memory),
+         mmse = case_when(mmse == "?" ~ NA_character_,
+                          TRUE ~ mmse),
+         mmse = as.numeric(mmse),
+         mmse = case_when(is.na(mmse) == TRUE ~ mean(mmse, na.rm = TRUE),
+                          TRUE ~ mmse))
+```
+
+We can check to see if the changes were made correctly.
+
+```{r}
+count(dementia_raw, memory)
+count(dementia_imputed, memory)
+
+dementia_raw %>% 
+  filter(mmse != "?") %>% 
+  ggplot(aes(as.numeric(mmse))) + 
+  geom_histogram(binwidth = 1)
+
+dementia_imputed %>% 
+  ggplot(aes(mmse)) + 
+  geom_histogram(binwidth = 1)
+```
+
+In the end, we choose to simply filter out the rows with missing data, and then make other adjustments as we see fit.
+
+```{r}
+dementia <-
+  dementia_raw %>%
+  distinct(Subject, .keep_all = TRUE) %>%
+  filter(mmse != "?", 
+         cdr == 0.5,
+         memory != "?") %>%
+  mutate(dx1 = case_when(dx1 == "'AD Dementia'" ~ 1,
+                         TRUE ~ 0),
+         mmse = as.numeric(mmse),
+         memory = as.numeric(memory)) %>%
+  rename(age = ageAtEntry,
+         gender = Gender) %>%
+  select(-c(Subject, cdr))
+```
+
+Finally, we can review the data with the ``ggpairs()`` function.
+
+```{r}
+library(GGally)
+ggpairs(dementia,
+        lower = list(combo = wrap("facethist", binwidth = 0.5)))
+```
+
+We could manually make any one of these plots or some alteration of them. For example, here is how we make a histogram of the age by each diagnosis type.
+
+```{r}
+dementia %>%
+  ggplot(aes(x = age)) +
+  geom_histogram(binwidth = 1) +
+  facet_wrap(as.factor(dx1) ~ ., nrow = 2)
+```
+
+# Supplemental: Cross-Validation and Hyperparameter Tuning (Advanced)
+
+Let's go through an example of how you would use the ``tidymodels`` package to help you tune some hyperparameters of a boosted tree model using cross-validation. First, you establish which hyperparamters you would like to tune and set the engine (package) that you would like to use to perform classification with a boosted tree model.
+
+```{r}
+library(tidymodels)
+
+model_xgb_cv <-
+  boost_tree(mode = "classification",
+             trees = 500,
+             tree_depth = tune(),
+             min_n = tune(),
+             loss_reduction = tune(),
+             sample_size = tune(),
+             mtry = tune(),
+             learn_rate = tune()) %>%
+  set_engine("xgboost")
+```
+
+Next, we add the model specification and our prediction formula to a workflow object.
+
+```{r}
+wf_xgb_cv <-
+  workflow() %>%
+  add_model(model_xgb_cv) %>%
+  add_formula(as.factor(dx1) ~ .)
+```
+
+Next, we make 5 folds for cross-validation.
+
+```{r}
+set.seed(42)
+df_folds <- vfold_cv(df_train, v = 5, repeats = 1, strata = dx1)
+```
+
+We make a grid of hyperparameters. We arbitrarily limit this grid to 10 combinations.
+
+```{r}
+grid_lh <- grid_latin_hypercube(
+  tree_depth(),
+  min_n(),
+  loss_reduction(),
+  sample_size = sample_prop(),
+  finalize(mtry(), df_train),
+  learn_rate(),
+  size = 10
+)
+grid_lh
+```
+
+Now, we tune the folds along the grid and save the output object.
+
+```{r}
+set.seed(42)
+tune_xgb_cv <-
+  wf_xgb_cv %>%
+  tune_grid(resamples = df_folds,
+            grid = grid_lh,
+            metrics = metric_set(roc_auc, sensitivity, specificity),
+            control = control_grid(save_pred = TRUE)
+  )
+```
+
+Then, we visualize how each of our 10 models performed according to each parameter.
+
+```{r}
+tune_xgb_cv %>%
+  collect_metrics() %>%
+  filter(.metric == "roc_auc") %>%
+  select(mean, mtry:sample_size) %>%
+  pivot_longer(mtry:sample_size,
+               values_to = "value",
+               names_to = "parameter") %>%
+  ggplot() +
+  aes(x = value, y = mean, color = parameter) +
+  geom_point(show.legend = FALSE) +
+  facet_wrap(~ parameter, scales = "free_x")
+```
+
+We pick out the model that perfmed best according to ROC AUC and finalize our workflow.
+
+```{r}
+show_best(tune_xgb_cv, metric = "roc_auc")
+
+best_param <- select_best(tune_xgb_cv, metric = "roc_auc")
+final_xgb <- finalize_workflow(wf_xgb_cv, best_param)
+```
+
+Finally, we make predictions with the selected model on the training set and plot an ROC curve
+
+```{r}
+final_result <- last_fit(final_xgb, splits, metrics = metric_set(roc_auc, specificity, sensitivity))
+collect_metrics(final_result)
+
+final_result %>%
+  collect_predictions() %>%
+  roc_curve(`as.factor(dx1)`, .pred_1) %>%
+  autoplot()
+```
+
+We also show that we can make a variable importance plot. (You can ignore the warning message here.)
+
+```{r}
+library(vip)
+final_xgb %>%
+  fit(df_train) %>%
+  pull_workflow_fit() %>%
+  vip(geom = "point") + 
+  theme_minimal()
+```
+

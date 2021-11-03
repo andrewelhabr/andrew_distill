@@ -1,0 +1,654 @@
+---
+title: "MSCR 598: Coding Tutorial"
+author: ""
+date: "9/16/2021"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+    number_sections: yes
+    code_download: yes
+    theme: united
+    highlight: tango
+  word_document:
+    toc: yes
+editor_options:
+  chunk_output_type: inline
+---
+
+```{r setup, include = FALSE}
+
+knitr::opts_chunk$set(cache = TRUE, echo = TRUE, message = TRUE, warning = TRUE, 
+                      fig.width = 8, fig.height = 5, dpi = 300)
+
+```
+
+# Week 1
+
+## Download R and Then RStudio
+
+## Introduce Panels of RStudio
+
+## Differences Between a .R and .Rmd File
+
+## R Basics
+
+R can initially be thought of as a calculator.
+
+```{r calculator}
+
+2 + 3
+
+2 > 3
+
+pi
+
+```
+
+It is also capable of assigning variables and performing operations with them.
+
+```{r assignment}
+
+a <- 4
+2 * a
+
+```
+
+You can see that we assigned `a` as `r a` here. You may also want to perform vector operations. Also, note that spacing often does not matter in R.
+
+```{r vector}
+
+1:5
+c(1, 2, 3, 4, 5)
+c(1,2,3,4,5)
+
+```
+
+You can seek help with how to use a function with the following command: `?seq`
+
+# Week 2
+
+## R Basics Continued
+
+We can be a little more robust with creating repetitive vectors. You do not have to explicitly write out the function arguments (like the first line of code does) if one follows the natural format of the function.
+
+```{r sequence}
+
+seq(from = 1, to = 5, by = 1)
+seq(1, 5, 1)
+
+```
+
+R can also handle composition of operations easily.
+
+```{r operations}
+
+seq(1, 5, 1) + seq(6, 10, 1)
+
+median(seq(1, 5, 1) + seq(6, 10, 1))
+
+```
+
+We will use the `tidyverse` meta-package (which loads in several packages together) to perform operations with actual data soon. Install this packages with `install.packages("tidyverse")`. Then load it with the following so that we can use its various built-in functions of its packages, like `select(), mutate(), summarize()`, etc, in the `dplyr` package.
+
+```{r packages}
+
+library(tidyverse)
+
+```
+
+Note that we will not directly discuss matrices, lists, joins, nor loops because these things are generally unnecessary for this class. Also, a real data set will likely have missing data, but we will not cover that here.
+
+## Data Loading and Exploration
+
+Now, let us move on to reading in and working with actual data. First, we use the `read_csv()` function from the `readr` package (which loads with `tidyverse`) to read in a .csv file as a tibble, which is a stylized table in R. You will need to manually change the file path to wherever the data is located locally for you. You can see that the `read_csv()` function automatically tells you how it interpreted the columns of the data.
+
+```{r load-data}
+
+dementia_original <- read_csv(file = "C:/Users/andre/Documents/clinical_alzheimers.csv")
+
+```
+
+There are countless ways to preview your data. One method to try is `View(dementia)`, which opens the data in a new tab allowing you to scroll around and check out all parts of it. You can also use the `head()` and `tail()` functions to preview just the top/bottom of the data. The `dim()` function directly tells you what the dimensions of your data is.
+
+```{r preview}
+
+head(dementia_original)
+tail(dementia_original)
+dim(dementia_original)
+
+```
+
+Before we move on, we need to clean the data a little we see how to create simple functions in R and how the `magrittr` (which loads with `tidyverse`) pipe function works.
+
+```{r cleaning}
+
+dementia <-
+  dementia_original %>%
+  mutate(sex = factor(sex, levels = c("female", "male"))) %>%
+  mutate(diagnosis = factor(diagnosis, levels = c(0, 1), labels = c("No Dementia", "Dementia"))) %>%
+  mutate(memory = factor(memory, levels = c(0, 0.5, 1)))
+
+```
+
+We can use some base R functions like the `summmary()`  function like `skim()` from the `skimr` package (which you may need to install separately with `install.packages("skimr")`) to get a better idea of what the data looks like.
+
+```{r data-summary}
+
+summary(dementia)
+
+```
+
+```{r skimr}
+
+library(skimr)
+skim(dementia)
+
+```
+
+You can also use other base R functions to compute specific statistics that you may be interested in. What is the max MMSE (mini-mental state exam) in the data? What range of ages are the patients? How does age correlate with MMSE?
+
+```{r descriptive}
+
+max(dementia$mmse)
+range(dementia$age)
+cor(dementia$age, dementia$mmse)
+
+```
+
+# Week 3
+
+## Table 1
+
+This brings us to something more practical that we can produce now that we know some `tidyverse` principles and practices. With the `gtsummary` package, we can build a reproducible Table 1 found in many research papers.
+
+```{r table-1-1}
+
+library(gtsummary)
+
+tbl_summary(data = dementia, by = diagnosis) %>% add_p()
+
+```
+
+# Week 4
+
+## Linear Regression
+
+Now we move on to some actual model building. We start with estimating a linear regression model to predict the MMSE score using all other variables (not including final diagnosis). Linear regression is best used when predicting a continuous variable, which is why we are not trying to predict the binary final diagnosis here. We can fit the linear model with the `lm()` function ("linear model") from the `stats` package that you already get when you install R. When interpreting the results with the `summary()` function, we can see that age and a memory score of 1 are significant predictors of the MMSE score and that the R-squared value of the model is 0.19.
+
+```{r lm}
+
+fit_lm <- lm(formula = mmse ~ age + sex + memory,
+             data = dementia)
+summary(fit_lm)
+
+```
+
+Now we can use the fitted model to make predictions on the MMSE. We use the `augment()` function from the `broom` package (`install.packages("broom")`) to more easily collect the fitted values (predictions) that this model makes. **Note that we have NOT separated the data into training and testing sets yet, so all performance measures are likely overstated right now. We will get back to that in the future. This week's code is here to help familiarize you with some of R's core modeling functions.**
+
+```{r lm-augment}
+
+library(broom)
+augment(fit_lm)
+
+```
+
+We can also make predictions on any arbitrary point that we would like with this model. We write out the point on which we would like to make a prediction using `tribble()` from the `tibble` package. Note that we need to arbitrarily fill out variables that we are not using for our prediction model with some value, so we do this by assigning a constant "c" with the value 0.
+
+```{r make-point}
+
+c <- 0
+point <- tribble(~age, ~sex, ~memory, ~dementia,
+                 75, "male", "1", c)
+
+```
+
+```{r show-point}
+
+point
+
+```
+
+```{r lm-prediction}
+
+predict(fit_lm, point)
+
+```
+
+## Logistic Regression
+
+Now let us move on to implementing logistic regression, which is often used for classification of an outcome of interest despite the use of the word "regression" in its name. Note that there is no R-squared for this model, but you can compute alternatives to this if desired. We will not do that here. First, we convert the outcome of interest, final diagnosis, into a factor because this is required of the `glm()` function ("generalized linear model"). We go ahead and change the memory variable into a factor too. (Logistic regression requires the part of code in the `family` argument of the `glm()` function. This part could be changed if you wanted to run something like Poisson regression.)
+
+```{r glm}
+
+fit_glm <- glm(formula = diagnosis ~ age + sex + mmse + memory,
+               data = dementia,
+               family = "binomial")
+summary(fit_glm)
+
+```
+
+Age and memory are shown to be significant predictors. The interpretation of the coefficient estimates are different though. If we exponentiate the estimates, we obtain the odds ratios for each predictor. And similar to before, we can us `tidy()` and `augment()` to help us obtain odds ratios and probability predictions.
+
+```{r glm-augment}
+
+tidy(fit_glm, exponentiate = TRUE)
+augment(fit_glm, type.predict = "response")
+
+```
+
+# Week 5
+
+## ROC Curve and Confusion Matrix
+
+One thing we are now able to do with the logistic regression model is make a receiver operating curve (ROC curve). The ROC curve shows us the trade-off between sensitivity and specificity at various probability thresholds. If we really wanted to make sure that all of the true positives were captured (higher sensitivity), then we may consider a very low probability threshold for classification. (One important note about the following code is that we made sure to tell the `roc_curve()` function from the `yardstick` package `(install.packages("yardstick")`) that our positive class is the second event level, i.e. 1, which is a final diagnosis of dementia and was encoded earlier.) Finally, we compute the area under the ROC curve using the `roc_auc()` function from the `yardstick` package. In a general sense, the closer to 1 that this value is, the better our model is.
+
+```{r glm-roc}
+
+library(yardstick)
+
+roc_glm <- augment(fit_glm, type.predict = "response")
+
+roc_curve(data = roc_glm, truth = diagnosis, estimate = .fitted, event_level = "second") %>% autoplot()
+
+```
+
+```{r glm-auc}
+
+roc_auc(data = roc_glm, truth = diagnosis, estimate = .fitted, event_level = "second")
+
+```
+
+Now, if we use the probability threshold of 0.5 and round our predictions to make a confusion matrix, just as we have done before, but instead use the `conf_mat()` function from the `yardstick` package, we can automatically compute various performance metrics. We are making a table like we have before, but by using the `conf_mat()` function to do this, we can now automatically pull various metrics about the table with the `summary()` function for this specific threshold. This is essentially how each point along the ROC is computed as a function of threshold.
+
+```{r glm-cm}
+
+cm_glm <-
+  fit_glm %>% 
+  augment(type.predict = "response") %>%
+  mutate(pred = ifelse(.fitted >= 0.5, "Dementia", "No Dementia"),
+         pred = factor(pred, levels = c("No Dementia", "Dementia"))) %>% 
+  conf_mat(truth = diagnosis, estimate = pred) 
+
+cm_glm
+
+```
+
+## Split Data
+
+Now that we have done some statistical modeling, let us move on to some machine learning concepts. First, we will focus on splitting the data into training and testing sets so that we can see what is meant by the infamous bias-variance trade-off of machine learning modeling. First, we set a seed, so that we can obtain reproducible results once we introduce some randomization into our process (randomly splitting the data). Then, for illustrative purposes, we add a column called "row" to check that our data split works. We use the ``initial_split()`` function from the ``rsample`` package to prepare the data for the split into training and testing sets.
+
+```{r split-setup}
+
+set.seed(404)
+
+library(rsample)
+
+dementia
+dementia_split <- initial_split(data = dementia, prob = 0.75, strata = diagnosis)
+
+```
+
+Then we use the ``training()`` and ``testing()`` functions from the ``rsample`` package on the split object to store our training and testing sets.
+
+```{r split-perform}
+
+dementia_train <- training(dementia_split)
+dementia_test <- testing(dementia_split)
+
+```
+
+
+## Decision Trees
+
+It only takes a few lines of code to generate a decision tree. Note the shorthand method we can use to write a formula if we want to use all possible predictors.
+
+```{r fit-decision-tree}
+
+library(rpart)
+
+fit_tree <- rpart(formula = diagnosis ~ ., data = dementia_train)
+
+```
+
+We can visualize the tree that was made with the ``prp()`` function from the ``rpart.plot`` package.
+
+```{r show-tree}
+
+library(rpart.plot)
+
+prp(fit_tree, extra = 2)
+
+```
+
+Given that there are only 228 observations in the training set, this individual decision tree looks like it could be overfit.
+
+# Week 6
+
+## Decision Trees (Continued)
+
+A way to decrease the complexity level of the tree is by changing some of the default parameters. For example, we could have demanded that a minimum of 50 observations must exist in a tree node in order for a split to be attempted at each node (instead of the default 20). This provides just a glimpse of the more formulaic way into which you can tune the hyperparameters of your model.
+
+```{r fit-tree-2}
+
+fit_tree2 <- rpart(diagnosis ~ ., data = dementia_train, minsplit = 50)
+prp(fit_tree2, extra = 2)
+
+```
+
+Now we can assess the performance of the decision trees on both the training and testing sets. Our intuition should tell us that the longer tree performs better on the data it was trained on, while the shorter tree probably performs better on the testing data set (unseen data). We can assess model performance with the steps seen in the following code chunks. The first code chunk shows to how to obtain internal training predictions from the first decision tree (fit_tree) by using the ``predict()`` function with the dementia_train data, convert the output into a tibble, select only the probabilities in the Dementia column (because the probability in the No Dementia column are just 1 - P(Dementia)), bind the probabilities back to the dementia training data set, and then use the ``roc_auc`` function to compute ROC AUC as we have previously done.
+
+```{r tree-1-train}
+
+predict(fit_tree, dementia_train) %>%
+  as_tibble() %>% 
+  select(Dementia) %>% 
+  bind_cols(dementia_train) %>% 
+  roc_auc(truth = diagnosis, estimate = Dementia, event_level = "second")
+
+```
+
+The following three code chunks are analogous to what was just done, except now with the second decision tree, and also with the testing set.
+
+```{r tree-2-train}
+
+predict(fit_tree2, dementia_train) %>%
+  as_tibble() %>% 
+  select(Dementia) %>% 
+  bind_cols(dementia_train) %>% 
+  roc_auc(truth = diagnosis, estimate = Dementia, event_level = "second")
+
+```
+
+```{r tree-1-test}
+
+predict(fit_tree, dementia_test) %>%
+  as_tibble() %>% 
+  select(Dementia) %>% 
+  bind_cols(dementia_test) %>% 
+  roc_auc(truth = diagnosis, estimate = Dementia, event_level = "second")
+
+```
+
+```{r tree-2-test}
+
+predict(fit_tree2, dementia_test) %>%
+  as_tibble() %>% 
+  select(Dementia) %>% 
+  bind_cols(dementia_test) %>% 
+  roc_auc(truth = diagnosis, estimate = Dementia, event_level = "second")
+
+```
+
+In the end, we can see the longer decision tree had a testing AUC of 0.824, but a training AUC of 0.547. On the other hand, the shorter decision tree had a testing AUC of 0.765, but a testing AUC of 0.576. First, these results tell us that both trees are severely overfit because of the large difference between training and testing performance. In addition, we observe that the shorter decision tree is not badly overfit, and in fact, performs better on unseen data (matching what our hypothesis was).
+
+## LASSO
+
+We have previously observed that the age and memory variables seem to be what our models are indicating to be the important variables for prediction. So let's explore the notion of variable selection with LASSO. First, we will use the ``glmnet()`` function from the ``glmnet`` package to make a LASSO trace plot, so that we can better understand how changing the penalty parameter in LASSO can push some coefficient estimates to 0 (regularization), effectively performing variable selection. Unlike the previous models, the ``glmnet()`` function does not take a formula as an input. Instead, we must encode our predictors as a matrix and ensure all variables are encoded as numerics. Similarly, our response variable must be in vector format. This inconvenience is why we would recommend using the ``tidymodels`` framework once you are comfortable enough with some modeling and working in R. The ``tidymodels`` framework standardizes notations/formats across a variety of model types and packages.
+
+```{r lasso-setup}
+
+library(glmnet)
+
+x_train <- 
+  dementia_train %>% 
+  mutate(sex = as.numeric(ifelse(sex == "male", 1, 0)),
+         memory = as.numeric(memory)) %>%
+  select(-diagnosis) %>%
+  as.matrix()
+
+y_train <- dementia_train %>% mutate(diagnosis = as.numeric(diagnosis) - 1) %>% pull(diagnosis)
+
+```
+
+Once we fit the LASSO model, we plot log lambda (the penalty parameter of LASSO) against the coefficient estimates to show how the coefficients eventually get pushed to 0.
+
+```{r lasso-trace}
+
+fit_lasso <- glmnet(x_train, y_train, alpha = 1, family = "binomial")
+
+plot(fit_lasso, xvar = "lambda", label = TRUE)
+
+```
+
+If we would like to arbitrarily extract the model coefficients at a log lambda of -3, we canuse the ``coef()`` function on the fitted LASSO model.
+
+```{r lasso-coef}
+
+coef(fit_lasso, s = exp(-3))
+
+```
+
+This begs the question of what penalty we should use for our finalized LASSO model. For this case, we can use cross-validated misclassification error. (Luckily, the ``cv.glmnet()`` function performs cross-validation without us having to put much effort in.) The following plot shows us the penalty at which the error is minimized, and the greatest penalty at which misclassification error is within one standard error of the estimated minimum error.
+
+```{r cv-lasso}
+
+fit_cvlasso <- cv.glmnet(x = x_train, y = y_train, alpha = 1, family = "binomial", type.measure = "class")
+plot(fit_cvlasso)
+
+```
+
+Then we can print out the lambdas and set of coefficients that correspond to the two dotted vertical lines in the plot above. Using the model recommendation as dictated by this one-standard-error rule is a heuristic that is commonly used.
+
+```{r cv-lasso-coef}
+
+fit_cvlasso$lambda.min
+coef(fit_cvlasso, s = fit_cvlasso$lambda.min)
+
+fit_cvlasso$lambda.1se
+coef(fit_cvlasso, s = fit_cvlasso$lambda.1se)
+
+```
+
+# Appendix
+
+We can use the `ggpairs()` function from the `GGally` package to obtain a better understanding of the data.
+
+```{r ggpairs}
+
+library(GGally)
+ggpairs(dementia, lower = list(combo = wrap("facethist", binwidth = 0.5)))
+
+```
+
+The base R functions are great for computing individual statistics, but if you would like to do something a little more complicated, it is often easier to use some `tidyverse` functions. What is the mean and standard deviation of age for each sex?
+
+```{r tidy-coding}
+
+dementia %>%
+  group_by(sex) %>%
+  summarize(mean_age = mean(age),
+            sd_age = sd(age))
+
+```
+
+## Plotting and Tables
+
+The following code shows how you can make a descriptive plot of the data using the `ggplot2` package (which is loaded with `tidyverse`). First, we tell R that we want to make a plot with the `ggplot()` function, and then we start adding details/layers to the plot. We tell R that we want the aesthetics (`aes()`) of the plot to be. In this case, we are interested in plotting diagnosis on the x-axis and age on the y-axis. Finally, we tell R what type of geometry (`geom_*()`) in which we want to place these aesthetics. In this case, we are interested in making a boxplot, so we call `geom_boxplot()`. Note that once you call the `ggplot()` function, adding layers to the plot requires the use of `+` instead of `%>%`.
+
+```{r tidy-plotting-1}
+
+dementia %>%
+  ggplot() +
+  aes(x = diagnosis, y = age) + 
+  geom_boxplot() 
+
+```
+
+We can make this a little nicer looking by adding a theme layer and labels.
+
+```{r tidy-plotting-2}
+
+dementia %>% # REQUIRED
+  ggplot() + # REQUIRED
+  aes(x = diagnosis, y = age) + # REQUIRED
+  geom_boxplot() + # REQUIRED
+  theme_classic() +
+  labs(x = "Diagnosis",
+       y = "Age")
+
+```
+
+We show how you can gain further insight by being more detailed about what you put in the `aes()` layer and what `geom_*()` you choose to use. From this, you can probably already tell that memory scores of 0 and 1 are highly correlated with final diagnosis. This is useful to know before we get into predictive modeling.
+
+```{r tidy-plotting-3}
+
+dementia %>% 
+  ggplot() +
+  aes(x = diagnosis, y = age, fill = memory) +
+  geom_dotplot(binwidth = 1, binaxis = "y", stackdir = "center", dotsize = 0.8, position = position_dodge(0.8)) +
+  theme_minimal() +
+  labs(x = "Diagnosis",
+       fill = "Memory Score",
+       y = "Age")
+
+```
+
+We can use some other functions from the `gtsummary` package, which has excellent documentation (`?gtsummary`). Essentially all of the core code here was copied/pasted from the package documentation. Just remember that there is almost always a package already out there for anything you desire to do/make.
+
+```{r table-1-2}
+
+dementia %>%
+  tbl_summary(by = diagnosis,
+              statistic = list(all_continuous() ~ "{mean} ({sd})",
+                               all_categorical() ~ "{n} ({p}%)"),
+              label = list(age ~ "Age",
+                           sex ~ "Sex",
+                           mmse ~ "Mini-Mental State Exam",
+                           memory ~ "Memory Score")) %>%
+  modify_header(all_stat_cols() ~ "**{level}** N =  {n} ({style_percent(p)}%)") %>%
+  modify_spanning_header(all_stat_cols() ~ "**Final Diagnosis**") %>%
+  add_p() %>%
+  add_overall() %>%
+  bold_labels() %>% 
+  as_flex_table()
+
+```
+
+We can plot out the predictions against the true values to get a visual sense of how our model performs. It looks like we greatly overpredicted a few MMSE values.
+
+```{r lm-plot}
+
+fit_lm %>% 
+  augment() %>% 
+  ggplot() + 
+  aes(x = mmse, y = .fitted) +
+  geom_point() +
+  #geom_smooth() +
+  #geom_abline(slope = 1, intercept = 0) +
+  theme_minimal() +
+  labs(x = "Actual MMSE",
+       y = "Predicted MMSE",
+       subtitle = NULL,
+       title = NULL)
+
+```
+
+If you are a more visual person, you can use see the effect estimates, standard errors, and p-values summarized with the `ggcoef_model()` function from the `GGally` package (`install.packages("GGally")`).
+
+```{r ggceof-model}
+
+library(GGally)
+ggcoef_model(fit_lm, intercept = TRUE)
+
+```
+
+One common practice in effect estimation is to wisely choose a base level of a categorical variables so that average effect interpretations are more digestible. We can choose to model the memory variable with a base level of 0.5 since it is most common. For prediction purposes, this choice of base level does not matter for model performance. 
+
+```{r lm-2}
+
+dementia_2 <-
+  dementia %>%
+  mutate(memory = factor(memory, levels = c("0.5", "1", "0")))
+
+lm(mmse ~ age + sex + memory, data = dementia_2) %>% summary() 
+
+```
+
+We show that you can use `gtsummary` package again to create a reproducible publication-ready table for regression output.
+
+```{r table-2}
+
+library(gtsummary)
+
+fit_glm %>% 
+  tbl_regression(exponentiate = TRUE,
+                 label = list(age ~ "Age",
+                              sex ~ "Sex",
+                              mmse ~ "Mini-Mental State Exam",
+                              memory ~ "Memory CDR Subsection Score")) %>%
+  bold_labels() %>% 
+  as_flex_table()
+
+```
+
+## Random Forest
+
+Another possible way to avoid overfitting with a single decision tree is to "bag" (bootstrap + aggregation) decision trees. More specifically, we can replicate our data hundreds of times via random sampling and fit a decision tree to each replica of the data. Then, we aggregate the predictions of each tree to make one prediction. This is the idea behind a random forest. In addition, we can reduce the correlation between our trees by only examining a random subset of predictors at each node for every tree.
+
+```{r random-forest}
+
+library(ranger)
+
+fit_rf <- ranger(diagnosis ~ ., data = dementia_train)
+fit_rf
+
+predict(fit_rf, dementia_test) %>%
+  pluck("predictions") %>%
+  as_tibble() %>% 
+  bind_cols(dementia_test) %>% 
+  rename(pred = value) %>%
+  conf_mat(truth = diagnosis, estimate = pred)
+
+```
+
+## Boosting
+
+As we have previously seen, a singular decision tree can be severely overfit to the data. One way to try to avoid this is by boosting. Boosting essentially means combining several "weak" learners, which decision trees are usually considered to be, into a strong learner. The idea behind this is to iteratively build decision trees, where each new tree learns from the errors of previous trees, and then the collection of trees are used to make predictions on new data.
+
+There are different ways in which this idea can be implemented, including Adaboost (adaptive boosting), but we will only try out gradient boosting here. The ``xgboost`` package requires that we have data in matrices. We have arbitrarily set the algorithm to stop after it has made 25 trees.
+
+```{r boosted-trees}
+
+library(xgboost)
+
+fit_xgb <- xgboost(data = x_train, label = y_train, 
+                   nrounds = 25, booster = "gbtree", objective = "binary:logistic", eval_metric = "error")
+
+x_test <-
+  dementia_test %>%
+  mutate(sex = as.numeric(ifelse(sex == "male", 1, 0)),
+         memory = as.numeric(memory)) %>%
+  select(-diagnosis) %>%
+  as.matrix()
+
+predict(fit_xgb, x_test) %>%
+  round() %>%
+  as_tibble() %>% 
+  select(value) %>%
+  bind_cols(dementia_test) %>% 
+  mutate(pred = factor(value, levels = c(0, 1), labels = c("No Dementia", "Dementia"))) %>%
+  conf_mat(truth = diagnosis, estimate = pred)
+
+```
+
+## Artificial Neural Network
+
+Another model we can use is the artificial neural network. This model is a little more abstract, but it is another way that we can try to learn the underlying relationships between the predictors and the outcome variable.
+
+```{r neural-net}
+
+library(nnet)
+
+fit_ann <- nnet(diagnosis ~ ., data = dementia_train, size = 2, rang = 0.1, decay = 0.0001, maxit = 100)
+fit_ann
+
+predict(fit_ann, dementia_test) %>%
+  round() %>%
+  as_tibble() %>% 
+  select(V1) %>% 
+  bind_cols(dementia_test) %>% 
+  mutate(pred = factor(V1, levels = c(0, 1), labels = c("No Dementia", "Dementia"))) %>%
+  conf_mat(truth = diagnosis, estimate = pred)
+
+```

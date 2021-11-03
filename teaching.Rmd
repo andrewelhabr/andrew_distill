@@ -6,11 +6,13 @@ title: "Teaching"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+Teaching Assistant for the following classes:
+
 ### ISyE 3232 Stochastic Manufacturing & Service Systems
 
 
 - Semesters: Fall 2016 (Rating: 4.7/5), Spring 2017 (Rating 4.8/5) \
-- Syllabus:
+- [Syllabus](https://github.com/andrewelhabr/andrew_distill/blob/aea76e745fb5d5ae3ec4aee146d78a095fb646b9/class-materials/2017_spring_isye-3232_syllabus.pdf)
 - Selected Comments: \
 -- *"He is responsible and kind. Quick responses to all emails and clearly answered my questions in a very kind manner. I can tell that he is really enthusiastic in what he is doing."* \
 -- *"He is enthusiastic about his assistance role, and this motivates students also."* \
@@ -20,7 +22,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ### ISyE 6501 Introduction to Analytics Modeling
 
 - Semesters: Summer 2017, Fall 2017, Summer 2018 (Rating 4.5/5; Highest Impact TA), Fall 2018 (Head TA) \
-- Syllabus:
+- [Syllabus](https://github.com/andrewelhabr/andrew_distill/blob/aea76e745fb5d5ae3ec4aee146d78a095fb646b9/class-materials/2018_fall_isye-6501_syllabus.pdf)
 - Selected Comments: \
 -- *"All TAs were great, but Andrew was the bomb! His explanations during office hours were extremely helpful, and while all TAs were very knowledgeable, Andrew had a way of explaining material that, for me, was really effective."* \
 -- *"Andrew was always prepared and I found his office hours excellent and informative."* \
@@ -29,5 +31,5 @@ knitr::opts_chunk$set(echo = TRUE)
 ### MSCR 598 Big Data to Knowledge (Emory)
 
 - Semesters: Fall 2020, Fall 2021
-- Syllabus:
-- Coding Materials:
+- [Syllabus](https://github.com/andrewelhabr/andrew_distill/blob/aea76e745fb5d5ae3ec4aee146d78a095fb646b9/class-materials/2021_fall_mscr-598_syllabus.pdf)
+- Coding Material: [Fall 2020](https://github.com/andrewelhabr/andrew_distill/blob/aea76e745fb5d5ae3ec4aee146d78a095fb646b9/class-materials/2021_fall_mscr-598_syllabus.pdf), [Fall 2021](https://github.com/andrewelhabr/andrew_distill/blob/aea76e745fb5d5ae3ec4aee146d78a095fb646b9/class-materials/2021_fall_mscr-598_syllabus.pdf)

@@ -1,7 +1,5 @@
 ---
 title: "Andrew ElHabr"
-description: |
-  it me
 site: distill::distill_website
 ---
 
@@ -11,10 +9,18 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 
-![](headshot.jpg){width=15%}
+![](headshot-circle.jpg){width=25%}
 
-## Education
+Now, here is a guy.
+
+### Research Interests
+
+### Education
 
 PhD Operations Research, Georgia Institute of Technology (Expected 2022) \
+- Minor: Economics
 
-BS Mechanical Engineering, University of Texas at Austin (2016)
+MS Operations Research, Georgia Institute of Technology (Expected 2022) \
+
+BS Mechanical Engineering, University of Texas at Austin (2016) \
+- Minor: Economics

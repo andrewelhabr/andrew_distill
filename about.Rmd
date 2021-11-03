@@ -6,4 +6,8 @@ title: "About"
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-placeholder
+CV and other information to eventually be placed here.
+
+### Awards
+
+2021 Judith Liebman Award Winner
