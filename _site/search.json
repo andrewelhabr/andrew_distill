@@ -3,39 +3,38 @@
     {
       "path": "about.html",
       "title": "About",
-      "description": "More awkward personal details here.",
       "author": [],
       "contents": "\r\nplaceholder\r\n\r\n\r\n\r\n",
-      "last_modified": "2021-11-02T22:59:20-04:00"
+      "last_modified": "2021-11-03T12:32:00-04:00"
     },
     {
       "path": "blog.html",
       "title": "Blog",
       "author": [],
       "contents": "\r\n\r\n\r\n\r\n",
-      "last_modified": "2021-11-02T22:59:22-04:00"
+      "last_modified": "2021-11-03T12:32:03-04:00"
     },
     {
       "path": "index.html",
-      "title": "Big Face Incoming",
+      "title": "Andrew ElHabr",
       "description": "it me\n",
       "author": [],
-      "contents": "\r\n\r\nEducation\r\nPhD Operations Research, Georgia Institute of Technology (Expected June 2022)\r\nBS Mechanical Engineering, University of Texas at Austin (May 2016)\r\n\r\n\r\n\r\n",
-      "last_modified": "2021-11-02T22:59:25-04:00"
+      "contents": "\r\n\r\nEducation\r\nPhD Operations Research, Georgia Institute of Technology (Expected 2022)\r\nBS Mechanical Engineering, University of Texas at Austin (2016)\r\n\r\n\r\n\r\n",
+      "last_modified": "2021-11-03T12:32:05-04:00"
     },
     {
       "path": "research.html",
       "title": "Research",
       "author": [],
       "contents": "\r\nplaceholder\r\n\r\n\r\n\r\n",
-      "last_modified": "2021-11-02T22:59:28-04:00"
+      "last_modified": "2021-11-03T12:32:07-04:00"
     },
     {
       "path": "teaching.html",
       "title": "Teaching",
       "author": [],
-      "contents": "\r\nplaceholder\r\n\r\n\r\n\r\n",
-      "last_modified": "2021-11-02T22:59:31-04:00"
+      "contents": "\r\nISyE 3232 Stochastic Manufacturing & Service Systems\r\nFall 2016 (Rating: 4.7/5), Spring 2017 (Rating 4.8/5)\r\nSyllabus:\r\nSelected Comments:\r\n– “He is responsible and kind. Quick responses to all emails and clearly answered my questions in a very kind manner. I can tell that he is really enthusiastic in what he is doing.”\r\n– “He is enthusiastic about his assistance role, and this motivates students also.”\r\n– “He was funny and really good at helping you understand the concepts.”\r\n– “Best TA I’ve had at GT.”\r\nISyE 6501 Introduction to Analytics Modeling\r\nSummer 2017, Fall 2017, Summer 2018 (Rating 4.5/5; Highest Impact TA), Fall 2018 (Head TA)\r\nSyllabus:\r\nSelected Comments:\r\n– “All TAs were great, but Andrew was the bomb! His explanations during office hours were extremely helpful, and while all TAs were very knowledgeable, Andrew had a way of explaining material that, for me, was really effective.”\r\n– “Andrew was always prepared and I found his office hours excellent and informative.”\r\n– “Andrew was the most helpful to us noobs re: navigating R.”\r\nMSCR 598 Big Data to Knowledge (Emory)\r\nFall 2020 (Rating 4.3/5), Fall 2021\r\nSyllabus:\r\nSelected Comments:\r\n\r\n\r\n\r\n",
+      "last_modified": "2021-11-03T12:32:09-04:00"
     }
   ],
   "collections": ["posts/posts.json"]

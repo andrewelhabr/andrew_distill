@@ -16,8 +16,6 @@ output:
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-placeholder \
-
-more placing
+placeholder
 
 

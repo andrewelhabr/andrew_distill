@@ -6,5 +6,28 @@ title: "Teaching"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-placeholder
+### ISyE 3232 Stochastic Manufacturing & Service Systems
 
+
+- Semesters: Fall 2016 (Rating: 4.7/5), Spring 2017 (Rating 4.8/5) \
+- Syllabus:
+- Selected Comments: \
+-- *"He is responsible and kind. Quick responses to all emails and clearly answered my questions in a very kind manner. I can tell that he is really enthusiastic in what he is doing."* \
+-- *"He is enthusiastic about his assistance role, and this motivates students also."* \
+-- *"He was funny and really good at helping you understand the concepts."* \
+-- *"Best TA I've had at GT."*
+
+### ISyE 6501 Introduction to Analytics Modeling
+
+- Semesters: Summer 2017, Fall 2017, Summer 2018 (Rating 4.5/5; Highest Impact TA), Fall 2018 (Head TA) \
+- Syllabus:
+- Selected Comments: \
+-- *"All TAs were great, but Andrew was the bomb! His explanations during office hours were extremely helpful, and while all TAs were very knowledgeable, Andrew had a way of explaining material that, for me, was really effective."* \
+-- *"Andrew was always prepared and I found his office hours excellent and informative."* \
+-- *"Andrew was the most helpful to us noobs re: navigating R."* \
+
+### MSCR 598 Big Data to Knowledge (Emory)
+
+- Semesters: Fall 2020, Fall 2021
+- Syllabus:
+- Coding Materials:

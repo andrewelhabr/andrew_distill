@@ -1,7 +1,5 @@
 ---
 title: "About"
-description: |
-  More awkward personal details here.
 ---
 
 ```{r setup, include=FALSE}
