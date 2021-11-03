@@ -32,4 +32,4 @@ Teaching Assistant for the following classes:
 
 - Semesters: Fall 2020, Fall 2021
 - [Syllabus](https://github.com/andrewelhabr/andrew_distill/blob/aea76e745fb5d5ae3ec4aee146d78a095fb646b9/class-materials/2021_fall_mscr-598_syllabus.pdf)
-- Coding Material: [Fall 2020](https://github.com/andrewelhabr/andrew_distill/blob/aea76e745fb5d5ae3ec4aee146d78a095fb646b9/class-materials/2021_fall_mscr-598_syllabus.pdf), [Fall 2021](https://github.com/andrewelhabr/andrew_distill/blob/aea76e745fb5d5ae3ec4aee146d78a095fb646b9/class-materials/2021_fall_mscr-598_syllabus.pdf)
+- Coding Material: [Fall 2020](https://github.com/andrewelhabr/andrew_distill/blob/d833c212a562b21f82f212cd1402db15dbd7eb96/class-materials/2020_fall_mscr-598_coding-material.Rmd), [Fall 2021](https://github.com/andrewelhabr/andrew_distill/blob/d833c212a562b21f82f212cd1402db15dbd7eb96/class-materials/2021_fall_mscr-598_coding-material.Rmd)
