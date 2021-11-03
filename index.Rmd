@@ -1,19 +1,21 @@
 ---
 title: "Andrew ElHabr"
+image: "headshot-circle.jpg"
 site: distill::distill_website
+links:
+  - label: Email
+    url: "mailto:andrewelhabr@gatech.edu"
+  - label: ORCID iD
+    url: "https://orcid.org/0000-0003-3778-5350"
+  - label: Twitter
+    url: "https://twitter.com/elhabro"
+  - label: GitHub
+    url: "https://github.com/andrewelhabr"
+output:
+  postcards::trestles
 ---
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
-
-```
-
-
-![](headshot-circle.jpg){width=25%}
-
-Now, here is a guy.
-
-### Research Interests
+ 
+I am a PhD student in Operations Research at Georgia Tech currently working on various projects related to value-based care and advanced imaging.
 
 ### Education
 
