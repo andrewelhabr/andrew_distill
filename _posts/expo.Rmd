@@ -1,5 +1,5 @@
 ---
-title: "Modeling Fun with Exponentials"
+title: "Expo"
 description: |
   Queueing has five consecuitve vowels.
 author:

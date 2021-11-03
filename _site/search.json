@@ -6,36 +6,36 @@
       "description": "More awkard personal details here.",
       "author": [],
       "contents": "\r\n\r\n\r\n\r\n",
-      "last_modified": "2021-11-02T22:17:34-04:00"
+      "last_modified": "2021-11-02T22:49:30-04:00"
     },
     {
       "path": "blog.html",
       "title": "Blog",
       "author": [],
       "contents": "\r\n\r\n\r\n\r\n",
-      "last_modified": "2021-11-02T22:17:38-04:00"
+      "last_modified": "2021-11-02T22:49:32-04:00"
     },
     {
       "path": "index.html",
-      "title": "Andrew ElHabr",
+      "title": "Big Face Incoming",
       "description": "it me\n",
       "author": [],
       "contents": "\r\n\r\nEducation\r\nPhD Operations Research, Georgia Institute of Technology (Expected June 2022) \\\r\nBS Mechanical Engineering, University of Texas at Austin (May 2016)\r\n\r\n\r\n\r\n",
-      "last_modified": "2021-11-02T22:17:42-04:00"
+      "last_modified": "2021-11-02T22:49:34-04:00"
     },
     {
       "path": "research.html",
       "title": "Research",
       "author": [],
       "contents": "\r\nplaceholder\r\n\r\n\r\n\r\n",
-      "last_modified": "2021-11-02T22:17:45-04:00"
+      "last_modified": "2021-11-02T22:49:36-04:00"
     },
     {
       "path": "teaching.html",
       "title": "Teaching",
       "author": [],
       "contents": "\r\nplaceholder\r\n\r\n\r\n\r\n",
-      "last_modified": "2021-11-02T22:17:48-04:00"
+      "last_modified": "2021-11-02T22:49:37-04:00"
     }
   ],
   "collections": ["posts/posts.json"]

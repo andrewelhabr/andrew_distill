@@ -1,8 +1,8 @@
 [
   {
     "path": "posts/",
-    "title": "Modeling Fun with Exponentials",
-    "description": "Queueing has five consecuitve vowerls.",
+    "title": "Expo",
+    "description": "Queueing has five consecuitve vowels.",
     "author": [
       {
         "name": "Andrew ElHabr",
@@ -13,7 +13,7 @@
     "categories": [],
     "contents": "\r\nplaceholder\r\nmore placing\r\n\r\n\r\n\r\n",
     "preview": "posts/expo.png",
-    "last_modified": "2021-11-02T22:02:47-04:00",
-    "input_file": {}
+    "last_modified": "2021-11-02T22:50:21-04:00",
+    "input_file": "expo.knit.md"
   }
 ]

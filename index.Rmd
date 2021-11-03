@@ -1,5 +1,5 @@
 ---
-title: "Andrew ElHabr"
+title: "Big Face Incoming"
 description: |
   it me
 site: distill::distill_website
@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 
-![](headshot.jpg){width=50}
+![](headshot.jpg){width=100}
 
 ## Education
 
