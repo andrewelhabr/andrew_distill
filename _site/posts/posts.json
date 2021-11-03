@@ -1,0 +1,19 @@
+[
+  {
+    "path": "posts/",
+    "title": "Modeling Fun with Exponentials",
+    "description": "Queueing has five consecuitve vowerls.",
+    "author": [
+      {
+        "name": "Andrew ElHabr",
+        "url": {}
+      }
+    ],
+    "date": "2021-11-02",
+    "categories": [],
+    "contents": "\r\nplaceholder\r\nmore placing\r\n\r\n\r\n\r\n",
+    "preview": "posts/expo.png",
+    "last_modified": "2021-11-02T22:02:47-04:00",
+    "input_file": {}
+  }
+]
