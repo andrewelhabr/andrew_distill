@@ -1,7 +1,6 @@
 ---
 title: "Coming Soon..."
-description: |
-  Under Construction.
+description:
 author:
   - name: Andrew ElHabr
 date: 2021-12-01
@@ -14,8 +13,9 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
+
+# |
+# Under construction.
 ```
 
 I have 3-5 short blog posts that have been worked on to various degrees, but it is not my priority to finish them right now. These will mostly not be academic in nature and will often use public data to show something interesting.
-
-

@@ -19,9 +19,7 @@ output:
 
 ### About Me
 
-My name is Andrew ElHabr, and I am a graduating Ph.D. candidate in Operations Research at the Georgia Institute of Technology. I have a breadth of research experience in healthcare topics such as pharmaceutical pricing, advanced diagnostic imaging, stroke and trauma outcomes, and telehealth. I have experience working with healthcare data in most of these areas, including using SQL/SAS to query large administrative claims databases and primarily R for data visualization, statistical and prediction modeling, and machine learning with reduced data sets.
-
-I am currently looking for a data science/analyst role in the healthcare space.
+My name is Andrew ElHabr, and I am a graduating Ph.D. candidate in Operations Research at the Georgia Institute of Technology. I have a breadth of research experience in healthcare topics such as pharmaceutical pricing, advanced diagnostic imaging, stroke and trauma outcomes, and telehealth. I have experience working with healthcare data in most of these areas, including using SQL/SAS to query large administrative claims databases and primarily R for data visualization, statistical and prediction modeling, and machine learning with reduced data sets. *I am currently looking for a data science/analyst role in the healthcare space.*
 
 [CV (updated January 7, 2022)](https://github.com/andrewelhabr/andrew_distill/blob/main/2022-01-07_cv_andrew-elhabr.pdf)
 
@@ -42,4 +40,4 @@ B.S. Mechanical Engineering, University of Texas at Austin (2016) \
 - machine learning methods, game theory, econometric modeling, causal inference, decision analysis, simulation
 
 *Applications:* \
-- health economics and outcomes, payment and reimbursement models, clinical decision-making, real-world evidence, pharmaceutical supply chain, telehealth
+- health economics and outcomes, payment and reimbursement models, clinical decision-making, real-world evidence, telehealth
