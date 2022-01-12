@@ -23,7 +23,7 @@ My name is Andrew ElHabr, and I am a graduating Ph.D. candidate in Operations Re
 
 I am currently looking for a data science/analyst role in the healthcare space.
 
-CV as of January 7, 2022: 
+[CV (updated January 7, 2022)](https://github.com/andrewelhabr/andrew_distill/blob/main/2022-01-07_cv_andrew-elhabr.pdf)
 
 ### Education
 
