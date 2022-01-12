@@ -6,7 +6,7 @@ title: "Teaching"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Teaching Assistant for the following classes:
+I have served as a graduate teaching assistant for the following classes:
 
 ### ISyE 3232 Stochastic Manufacturing & Service Systems
 
