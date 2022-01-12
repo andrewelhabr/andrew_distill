@@ -8,7 +8,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ### Honors and Awards
 
-- Judith Liebman Award (2021) \
+- INFORMS Judith Liebman Award (2021) \
 - George Family Foundation Fellowship (2019) \
 - Goizueta Foundation Fellowship (2016-2018) \
 - UT Austin EOE Academic Leaders Hall of Fame (2016) \
