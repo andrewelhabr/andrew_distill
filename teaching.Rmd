@@ -10,7 +10,6 @@ I have served as a graduate teaching assistant for the following classes:
 
 ### ISyE 3232 Stochastic Manufacturing & Service Systems
 
-
 - Semesters: Fall 2016 (Rating: 4.7/5), Spring 2017 (Rating 4.8/5) \
 - [Syllabus](https://github.com/andrewelhabr/andrew_distill/blob/aea76e745fb5d5ae3ec4aee146d78a095fb646b9/class-materials/2017_spring_isye-3232_syllabus.pdf)
 - Selected Comments: \

@@ -6,6 +6,14 @@ title: "Research"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+### Interests
+
+*Methodology:* \
+- machine learning methods, game theory, econometric modeling, causal inference, decision analysis, simulation
+
+*Applications:* \
+- health economics and outcomes, payment and reimbursement models, clinical decision-making, real-world evidence, pharmaceutical supply chain, telehealth
+
 ### Publications
 
 1. **A. ElHabr**, S. Merdan, R. Duscak, M. Horn&#253;, T. Hanna, A. Prater, T. Ayer, D. Hughes (2022). Increasing Utilization of Emergency Department Neuroimaging From 2007 Through 2017. *American Journal of Roentgenology*, 218(1), 165-173. [paper](https://www.ajronline.org/doi/abs/10.2214/AJR.21.25864)
@@ -22,4 +30,3 @@ knitr::opts_chunk$set(echo = TRUE)
 
 - Outcome-based Pharmaceutical Contracting for Heterogeneous Patient Groups (*POMS 2019, INFORMS Annual Meeting 2019, INFORMS Annual Meeting 2021*)
 - Value of Diagnostic Imaging Prior to Embolization in Pelvic-related Trauma Patients (*INFORMS Healthcare 2021*)
-
