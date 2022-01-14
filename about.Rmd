@@ -26,9 +26,9 @@ I enjoy watching and playing just about every sport you can name. I am remarkabl
 knitr::include_graphics("schertz-basketball.jpg")
 ```
 
-The following are some of my favorite childhood pictures:
+The following are some of my favorite childhood pictures (and no, I cannot tell the difference between [Tony](https://tonyelhabr.rbind.io/about.html) and me):
 
 ```{r, echo=FALSE, out.width="50%", out.height="50%", fig.align="center"}
-knitr::include_graphics("baby-halloween.jpg")
-knitr::include_graphics("child-camel.jpg")
+knitr::include_graphics(c("baby-halloween.jpg", "schertz-twins.jpg", "lebanon-twins-1.jpg",
+                          "lebanon-twins-2.jpg", "child-camel.jpg", "baby-texas.jpg"))
 ```

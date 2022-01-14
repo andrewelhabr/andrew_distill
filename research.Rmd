@@ -9,7 +9,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ### Interests
 
 *Methodology:* \
-- machine learning methods, game theory, econometric modeling, causal inference, decision analysis, simulation
+- data analytics, machine learning methods, game theory, econometric modeling, causal inference, decision analysis, simulation
 
 *Applications:* \
 - health economics and outcomes, payment and reimbursement models, clinical decision-making, real-world evidence, pharmaceutical supply chain, telehealth
